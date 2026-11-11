@@ -17,7 +17,7 @@ export default function App() {
   const [pending, setPending] = useState(false)
   const [problem, setProblem] = useState<Problem>(null)
   const [alreadyShortened, setAlreadyShortened] = useState(false)
-  const { current, history, arrivingCode, cameFromRecent } = useLinkState()
+  const { current, history, arrivingCode, cameFromRecent, removingCodes } = useLinkState()
   const inFlight = useRef(false)
   const noticeTimer = useRef<number | undefined>(undefined)
   const inputRef = useRef<HTMLInputElement>(null)
@@ -113,12 +113,17 @@ export default function App() {
             {current && (
               <>
                 <p className="sr-only">Short link ready: {current.shortUrl}</p>
-                <ShortLinkResult key={current.code} link={current} cameFromRecent={cameFromRecent} />
+                <ShortLinkResult
+                  key={current.code}
+                  link={current}
+                  cameFromRecent={cameFromRecent}
+                  removing={removingCodes.includes(current.code)}
+                />
               </>
             )}
           </div>
           <div className={cn('load-in', earlier.length > 0 && (current ? 'mt-8' : 'mt-3'))} style={{ '--i': 2 } as CSSProperties}>
-            {earlier.length > 0 && <RecentLinks links={earlier} arrivingCode={arrivingCode} />}
+            {earlier.length > 0 && <RecentLinks links={earlier} arrivingCode={arrivingCode} removingCodes={removingCodes} />}
           </div>
         </LayoutGroup>
         <Toaster />

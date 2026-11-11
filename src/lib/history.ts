@@ -34,3 +34,7 @@ export function newestPerUrl(links: ShortLink[]): ShortLink[] {
 export function findByUrl(links: ShortLink[], url: string): ShortLink | undefined {
   return links.find((link) => sameUrl(link.url, url))
 }
+
+export function removeFromHistory(links: ShortLink[], code: string): ShortLink[] {
+  return links.filter((link) => link.code !== code)
+}

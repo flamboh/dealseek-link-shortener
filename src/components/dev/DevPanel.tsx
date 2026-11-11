@@ -192,7 +192,7 @@ export function DevPanel() {
             </section>
 
             <section className="grid gap-3">
-              <SectionTitle icon={Alert02Icon}>simulate create request</SectionTitle>
+              <SectionTitle icon={Alert02Icon}>simulate create or revoke request</SectionTitle>
               <div className="grid grid-cols-2 gap-2">
                 {simulations.map((item) => {
                   const active = simulation.armed === item.kind

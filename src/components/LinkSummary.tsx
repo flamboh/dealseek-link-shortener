@@ -8,6 +8,7 @@ import { displayUrl, formatStats } from '../lib/format'
 import { useLinkStats } from '../lib/link-store'
 import { showToast } from '../lib/toast'
 import { cn } from '../lib/utils'
+import { RevokeControls } from './RevokeControls'
 
 type LinkSummaryProps = {
   link: ShortLink
@@ -26,6 +27,18 @@ export function LinkSummary({ link, prominent = false }: LinkSummaryProps) {
     if (shortRef.current) window.getSelection()?.selectAllChildren(shortRef.current)
     showToast('Couldn’t copy. Select the link and copy it manually.')
   }
+
+  const openLink = !prominent && (
+    <a
+      href={link.shortUrl}
+      target="_blank"
+      rel="noopener noreferrer"
+      aria-label={`Open ${link.shortUrl} in a new tab`}
+      className="inline-flex size-8 items-center justify-center rounded-md text-muted-foreground outline-none transition-colors duration-100 hover:bg-accent hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring active:bg-border dark:hover:bg-accent/50 dark:active:bg-accent"
+    >
+      <HugeiconsIcon icon={ArrowUpRight01Icon} strokeWidth={2} className="size-4" />
+    </a>
+  )
 
   return (
     <>
@@ -63,17 +76,9 @@ export function LinkSummary({ link, prominent = false }: LinkSummaryProps) {
           </motion.p>
         )}
       </div>
-      {!prominent && (
-        <motion.div layoutId={`${link.code}:open`} layout="position" className="relative">
-          <a
-            href={link.shortUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            aria-label={`Open ${link.shortUrl} in a new tab`}
-            className="inline-flex size-8 items-center justify-center rounded-md text-muted-foreground outline-none transition-colors duration-100 hover:bg-accent hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring active:bg-border dark:hover:bg-accent/50 dark:active:bg-accent"
-          >
-            <HugeiconsIcon icon={ArrowUpRight01Icon} strokeWidth={2} className="size-4" />
-          </a>
+      {(link.ownerToken || !prominent) && (
+        <motion.div layoutId={`${link.code}:actions`} layout="position" className="relative flex items-center gap-0.5">
+          {link.ownerToken ? <RevokeControls link={link}>{openLink}</RevokeControls> : openLink}
         </motion.div>
       )}
     </>

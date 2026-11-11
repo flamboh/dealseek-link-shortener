@@ -1,13 +1,16 @@
 import { motion } from 'motion/react'
 import type { ShortLink } from '../lib/api'
+import { finishRemoving } from '../lib/link-store'
 import { LinkSummary } from './LinkSummary'
+import { linkTransition } from './motion'
 
 type RecentLinksProps = {
   links: ShortLink[]
   arrivingCode: string | null
+  removingCodes: string[]
 }
 
-export function RecentLinks({ links, arrivingCode }: RecentLinksProps) {
+export function RecentLinks({ links, arrivingCode, removingCodes }: RecentLinksProps) {
   return (
     <section aria-labelledby="recent-label">
       <motion.h2
@@ -28,7 +31,16 @@ export function RecentLinks({ links, arrivingCode }: RecentLinksProps) {
       />
       <ul>
         {links.map((link) => (
-          <motion.li key={link.code} layoutId={link.code} className="relative flex items-center gap-3 border-b border-border py-2 pr-2 pl-3">
+          <motion.li
+            key={link.code}
+            layoutId={link.code}
+            animate={{ opacity: removingCodes.includes(link.code) ? 0 : 1 }}
+            transition={{ default: linkTransition, opacity: { duration: 0.18, ease: 'easeOut' } }}
+            onAnimationComplete={() => {
+              if (removingCodes.includes(link.code)) finishRemoving(link.code)
+            }}
+            className="relative flex items-center gap-3 border-b border-border py-2 pr-2 pl-3"
+          >
             {link.code === arrivingCode && (
               <motion.span
                 aria-hidden="true"

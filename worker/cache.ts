@@ -3,6 +3,8 @@ export interface LinkCache {
   put(code: string, url: string): Promise<void>
 }
 
+export const REVOKED = 'revoked'
+
 export const CACHE_TTL_SECONDS = 60 * 60 * 24
 
 export function kvLinkCache(kv: KVNamespace, ttlSeconds = CACHE_TTL_SECONDS): LinkCache {

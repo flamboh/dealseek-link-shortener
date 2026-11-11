@@ -1,6 +1,6 @@
 import { useSyncExternalStore } from 'react'
 import { fetchStats, type LinkStats, type ShortLink } from './api'
-import { addToHistory, loadHistory, saveHistory } from './history'
+import { addToHistory, loadHistory, removeFromHistory, saveHistory } from './history'
 
 export type LinkState = {
   current: ShortLink | null
@@ -8,6 +8,7 @@ export type LinkState = {
   arrivingCode: string | null
   cameFromRecent: boolean
   stats: Record<string, LinkStats>
+  removingCodes: string[]
 }
 
 let state: LinkState | null = null
@@ -15,7 +16,7 @@ let loadingStats = false
 const listeners = new Set<() => void>()
 
 function getState(): LinkState {
-  state ??= { current: null, history: loadHistory(), arrivingCode: null, cameFromRecent: false, stats: {} }
+  state ??= { current: null, history: loadHistory(), arrivingCode: null, cameFromRecent: false, stats: {}, removingCodes: [] }
   return state
 }
 
@@ -71,6 +72,7 @@ export function showLink(link: ShortLink) {
   const { current, history, stats } = getState()
   if (current?.code === link.code) return
   setState({
+    ...getState(),
     current: link,
     history: addToHistory(history, link),
     arrivingCode: current?.code ?? null,
@@ -94,5 +96,26 @@ export function clearCurrent() {
 }
 
 export function clearHistory() {
-  setState({ current: null, history: [], arrivingCode: null, cameFromRecent: false, stats: {} })
+  setState({ current: null, history: [], arrivingCode: null, cameFromRecent: false, stats: {}, removingCodes: [] })
+}
+
+export function startRemoving(code: string) {
+  const { removingCodes } = getState()
+  if (removingCodes.includes(code)) return
+  setState({ ...getState(), removingCodes: [...removingCodes, code] })
+}
+
+export function finishRemoving(code: string) {
+  const { current, history, arrivingCode, cameFromRecent, stats, removingCodes } = getState()
+  if (!removingCodes.includes(code)) return
+  const { [code]: _removed, ...remainingStats } = stats
+  const wasCurrent = current?.code === code
+  setState({
+    current: wasCurrent ? null : current,
+    history: removeFromHistory(history, code),
+    arrivingCode: wasCurrent || arrivingCode === code ? null : arrivingCode,
+    cameFromRecent: wasCurrent ? false : cameFromRecent,
+    stats: remainingStats,
+    removingCodes: removingCodes.filter((item) => item !== code),
+  })
 }
