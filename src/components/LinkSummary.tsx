@@ -19,7 +19,7 @@ export function LinkSummary({ link, prominent = false }: LinkSummaryProps) {
           href={link.shortUrl}
           target="_blank"
           rel="noopener noreferrer"
-          className="group/link flex w-fit max-w-full origin-left items-center gap-1.5 rounded-sm outline-none transition-[scale] duration-150 ease-out focus-visible:ring-[3px] focus-visible:ring-ring/50 active:scale-[0.97] motion-reduce:active:scale-100"
+          className="group/link flex w-fit max-w-full origin-left items-center gap-1.5 rounded-sm outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50"
         >
           <motion.span
             layoutId={`${link.code}:short`}

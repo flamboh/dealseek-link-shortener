@@ -18,8 +18,8 @@ export function IconSwap({ switched, first, second, className }: IconSwapProps) 
       <span
         data-icon-swap="first"
         className={cn(
-          'absolute inset-0 flex items-center justify-center transition-[opacity,filter,scale] duration-200 ease-[cubic-bezier(0.23,1,0.32,1)] motion-reduce:transition-none motion-reduce:delay-0',
-          switched ? 'scale-50 opacity-0 blur-[2px] delay-0' : 'blur-none scale-100 opacity-100 delay-[40ms]',
+          'absolute inset-0 flex items-center justify-center transition-opacity duration-150 ease-out motion-reduce:transition-none',
+          switched ? 'opacity-0' : 'opacity-100',
         )}
       >
         {first}
@@ -27,8 +27,8 @@ export function IconSwap({ switched, first, second, className }: IconSwapProps) 
       <span
         data-icon-swap="second"
         className={cn(
-          'absolute inset-0 flex items-center justify-center transition-[opacity,filter,scale] duration-200 ease-[cubic-bezier(0.23,1,0.32,1)] motion-reduce:transition-none motion-reduce:delay-0',
-          switched ? 'blur-none scale-100 opacity-100 delay-[40ms]' : 'scale-50 opacity-0 blur-[2px] delay-0',
+          'absolute inset-0 flex items-center justify-center transition-opacity duration-150 ease-out motion-reduce:transition-none',
+          switched ? 'opacity-100' : 'opacity-0',
         )}
       >
         {second}
