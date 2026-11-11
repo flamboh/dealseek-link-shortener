@@ -1,10 +1,11 @@
 import { useState, type ReactNode } from 'react'
 import { HugeiconsIcon } from '@hugeicons/react'
-import { Alert02Icon, Cancel01Icon, Link02Icon, PreferenceHorizontalIcon } from '@hugeicons/core-free-icons'
+import { Alert02Icon, Analytics01Icon, Cancel01Icon, Link02Icon, PreferenceHorizontalIcon } from '@hugeicons/core-free-icons'
 import { shortenLink } from '../../lib/api'
 import { addEarlierLink, clearCurrent, clearHistory, useLinkState } from '../../lib/link-store'
 import { cn } from '../../lib/utils'
 import { Button } from '../ui/button'
+import { simulateClicks } from './clicks'
 import { seedUrls } from './seed-urls'
 import { arm, setSticky, simulations, useSimulation, withoutSimulation } from './simulation'
 
@@ -52,6 +53,7 @@ function seedMessage(status: SeedStatus) {
 export function DevPanel() {
   const [open, setOpen] = useState(readOpen)
   const [seed, setSeed] = useState<SeedStatus>({ kind: 'idle' })
+  const [clicking, setClicking] = useState(false)
   const { current, history } = useLinkState()
   const simulation = useSimulation()
   const seeding = seed.kind === 'running'
@@ -79,6 +81,13 @@ export function DevPanel() {
   }
 
   const message = seedMessage(seed)
+
+  const runClicks = async (newVisitors: boolean) => {
+    if (!current) return
+    setClicking(true)
+    await simulateClicks(current.code, 3, newVisitors)
+    setClicking(false)
+  }
 
   return (
     <div
@@ -154,6 +163,32 @@ export function DevPanel() {
                   {message}
                 </p>
               )}
+            </section>
+
+            <section className="grid gap-3">
+              <SectionTitle icon={Analytics01Icon}>simulate clicks</SectionTitle>
+              <div className="grid grid-cols-2 gap-2">
+                <Button
+                  type="button"
+                  variant="outline"
+                  className="h-auto flex-col items-start gap-0 px-3 py-1.5 text-left text-xs"
+                  disabled={!current?.ownerToken || clicking}
+                  onClick={() => void runClicks(false)}
+                >
+                  <span>+3 same visitor</span>
+                  <span className="font-normal text-muted-foreground">on the current card</span>
+                </Button>
+                <Button
+                  type="button"
+                  variant="outline"
+                  className="h-auto flex-col items-start gap-0 px-3 py-1.5 text-left text-xs"
+                  disabled={!current?.ownerToken || clicking}
+                  onClick={() => void runClicks(true)}
+                >
+                  <span>+3 new visitors</span>
+                  <span className="font-normal text-muted-foreground">on the current card</span>
+                </Button>
+              </div>
             </section>
 
             <section className="grid gap-3">

@@ -3,7 +3,15 @@ export type ShortLink = {
   shortUrl: string
   url: string
   createdAt: string
+  ownerToken?: string
 }
+
+export type LinkStats = {
+  clicks: number
+  visitors: number
+}
+
+export const MAX_STATS_LINKS = 50
 
 export type ShortenResult =
   | { ok: true; link: ShortLink }
@@ -22,7 +30,8 @@ export function isShortLink(value: unknown): value is ShortLink {
     typeof record.code === 'string' &&
     typeof record.shortUrl === 'string' &&
     typeof record.url === 'string' &&
-    typeof record.createdAt === 'string'
+    typeof record.createdAt === 'string' &&
+    (record.ownerToken === undefined || typeof record.ownerToken === 'string')
   )
 }
 
@@ -82,4 +91,34 @@ export async function shortenLink(url: string): Promise<ShortenResult> {
   }
 
   return { ok: false, kind: 'unavailable' }
+}
+
+function isLinkStats(value: unknown): value is LinkStats {
+  if (typeof value !== 'object' || value === null) return false
+  const record = value as Record<string, unknown>
+  return typeof record.clicks === 'number' && typeof record.visitors === 'number'
+}
+
+export async function fetchStats(links: ShortLink[]): Promise<Record<string, LinkStats> | null> {
+  const queries = links
+    .filter((link) => link.ownerToken)
+    .slice(0, MAX_STATS_LINKS)
+    .map((link) => ({ code: link.code, token: link.ownerToken }))
+  if (queries.length === 0) return {}
+
+  let response: Response
+  try {
+    response = await fetch('/api/stats', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+      body: JSON.stringify({ links: queries }),
+    })
+  } catch {
+    return null
+  }
+  if (!response.ok) return null
+
+  const stats = ((await readJson(response)) as { stats?: unknown } | null)?.stats
+  if (typeof stats !== 'object' || stats === null) return null
+  return Object.fromEntries(Object.entries(stats).filter((entry): entry is [string, LinkStats] => isLinkStats(entry[1])))
 }

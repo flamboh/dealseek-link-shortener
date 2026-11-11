@@ -1,11 +1,16 @@
 import type { LinkCache } from './cache'
 import { isBlocked } from './blocklist'
 import { generateCode } from './codes'
+import { hashOwnerToken, newOwnerToken } from './hash'
 
 export interface Link {
   code: string
   url: string
   createdAt: number
+}
+
+export interface CreatedLink extends Link {
+  ownerToken: string
 }
 
 const MAX_CODE_ATTEMPTS = 10
@@ -17,18 +22,22 @@ export async function createLink(
   cache: LinkCache,
   url: string,
   nextCode: () => string = generateCode,
-): Promise<Link> {
+): Promise<CreatedLink> {
   const createdAt = Date.now()
+  const ownerToken = newOwnerToken()
+  const ownerTokenHash = await hashOwnerToken(ownerToken)
   for (let attempt = 0; attempt < MAX_CODE_ATTEMPTS; attempt++) {
     const code = nextCode()
     if (isBlocked(code)) continue
     const result = await db
-      .prepare('INSERT INTO links (code, url, created_at) VALUES (?, ?, ?) ON CONFLICT (code) DO NOTHING')
-      .bind(code, url, createdAt)
+      .prepare(
+        'INSERT INTO links (code, url, created_at, owner_token_hash) VALUES (?, ?, ?, ?) ON CONFLICT (code) DO NOTHING',
+      )
+      .bind(code, url, createdAt, ownerTokenHash)
       .run()
     if (result.meta.changes === 1) {
       await cache.put(code, url)
-      return { code, url, createdAt }
+      return { code, url, createdAt, ownerToken }
     }
   }
   throw new CodeGenerationError(`No free code after ${MAX_CODE_ATTEMPTS} attempts`)

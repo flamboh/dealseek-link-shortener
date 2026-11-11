@@ -1,0 +1,19 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "dealseek-link-stats",
+  "main": "worker/stats-worker.ts",
+  "compatibility_date": "2026-11-01",
+  "workers_dev": false,
+  "preview_urls": false,
+  "observability": { "enabled": true },
+  "durable_objects": { "bindings": [{ "name": "LINK_STATS", "class_name": "LinkStats" }] },
+  "migrations": [{ "tag": "v1", "new_sqlite_classes": ["LinkStats"] }],
+  "env": {
+    "preview": {
+      "name": "dealseek-link-stats-preview",
+      "workers_dev": false,
+      "preview_urls": false,
+      "durable_objects": { "bindings": [{ "name": "LINK_STATS", "class_name": "LinkStats" }] }
+    }
+  }
+}
