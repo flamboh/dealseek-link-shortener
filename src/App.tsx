@@ -1,11 +1,12 @@
-import { useRef, useState, type FormEvent } from 'react'
-import { Coupon } from './components/Coupon'
-import { LinkHistory } from './components/LinkHistory'
+import { useRef, useState } from 'react'
+import { LinkForm, type Problem } from './components/LinkForm'
+import { RecentLinks } from './components/RecentLinks'
+import { ShortLinkResult } from './components/ShortLinkResult'
+import { Wordmark } from './components/Wordmark'
+import { Toaster } from './components/ui/sonner'
 import { shortenLink, type ShortLink } from './lib/api'
 import { addToHistory, loadHistory, saveHistory } from './lib/history'
 import { checkUrl } from './lib/validate-url'
-
-type Problem = { kind: 'invalid'; message: string } | { kind: 'unavailable' } | null
 
 export default function App() {
   const [input, setInput] = useState('')
@@ -54,91 +55,38 @@ export default function App() {
     }
   }
 
-  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault()
-    void submit()
+  const handleValueChange = (value: string) => {
+    setInput(value)
+    if (problem) setProblem(null)
   }
 
   return (
-    <div className="min-h-dvh bg-paper text-ink">
-      <div className="mx-auto w-full max-w-2xl px-4 pt-6 pb-20 sm:px-8 sm:pt-10">
-        <header className="flex items-center gap-2.5">
-          <img src="/favicon.svg" alt="" width={28} height={28} className="rounded-md" />
-          <span className="text-base font-bold">Dealseek links</span>
-        </header>
-
-        <main className="mt-14 sm:mt-20">
-          <h1 className="max-w-[14ch] font-display text-[3.25rem] leading-[0.92] font-extrabold tracking-[-0.01em] text-balance sm:text-[5.25rem]">
-            Paste a long link. Share a short one.
-          </h1>
-          <p className="mt-4 max-w-[46ch] text-lg leading-relaxed text-muted">
-            Deal pages come with long tracking links. Turn one into a link you can drop into a chat or post.
-          </p>
-
-          <form onSubmit={handleSubmit} noValidate className="mt-8">
-            <label htmlFor="url" className="mb-2 block text-sm font-bold">
-              Long link
-            </label>
-            <div className="flex flex-col gap-2 sm:flex-row">
-              <input
-                ref={inputRef}
-                id="url"
-                name="url"
-                type="url"
-                inputMode="url"
-                autoComplete="off"
-                autoCapitalize="off"
-                spellCheck={false}
-                placeholder="example.com/deal"
-                value={input}
-                onChange={(event) => {
-                  setInput(event.target.value)
-                  if (problem?.kind === 'invalid') setProblem(null)
-                }}
-                aria-invalid={problem?.kind === 'invalid'}
-                aria-describedby={problem ? 'url-problem' : undefined}
-                className="min-h-13 min-w-0 flex-1 rounded-xl border-2 border-line bg-surface px-4 text-lg text-ink placeholder:text-muted/70 focus-visible:outline-none focus:border-brand focus:ring-4 focus:ring-brand/20 aria-[invalid=true]:border-danger"
-              />
-              <button
-                type="submit"
-                aria-disabled={pending}
-                className="min-h-13 cursor-pointer rounded-xl bg-brand px-7 text-lg font-bold text-on-brand transition-colors hover:bg-brand-press aria-disabled:cursor-progress aria-disabled:opacity-80"
-              >
-                {pending ? 'Shortening…' : 'Shorten'}
-              </button>
-            </div>
-            <div id="url-problem" aria-live="polite" className="min-h-7 pt-2">
-              {problem?.kind === 'invalid' && (
-                <p className="text-sm font-bold text-danger">{problem.message}</p>
-              )}
-              {problem?.kind === 'unavailable' && (
-                <p className="text-sm text-danger">
-                  <span className="font-bold">Couldn’t reach the link service.</span> Check your connection, then{' '}
-                  <button
-                    type="button"
-                    onClick={() => void submit()}
-                    className="cursor-pointer rounded-sm font-bold underline underline-offset-2"
-                  >
-                    try again
-                  </button>
-                  .
-                </p>
-              )}
-            </div>
-          </form>
-
-          <div aria-live="polite" className="mt-4">
-            {current && (
-              <>
-                <p className="sr-only">Short link ready: {current.shortUrl}</p>
-                <Coupon key={current.code} link={current} />
-              </>
-            )}
-          </div>
-
-          {earlier.length > 0 && <LinkHistory links={earlier} />}
-        </main>
+    <main className="mx-auto flex w-full max-w-md flex-col px-4 pt-[16vh] pb-16">
+      <Wordmark />
+      <div className="mt-10">
+        <LinkForm
+          value={input}
+          onValueChange={handleValueChange}
+          onSubmit={() => void submit()}
+          pending={pending}
+          problem={problem}
+          inputRef={inputRef}
+        />
       </div>
-    </div>
+      <div aria-live="polite" className="mt-2">
+        {current && (
+          <>
+            <p className="sr-only">Short link ready: {current.shortUrl}</p>
+            <ShortLinkResult key={current.code} link={current} />
+          </>
+        )}
+      </div>
+      {earlier.length > 0 && (
+        <div className="mt-10">
+          <RecentLinks links={earlier} />
+        </div>
+      )}
+      <Toaster position="bottom-center" />
+    </main>
   )
 }

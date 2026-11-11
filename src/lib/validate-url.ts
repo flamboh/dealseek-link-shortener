@@ -7,15 +7,15 @@ export function checkUrl(input: string): UrlCheck {
   const value = input.trim()
 
   if (!value) {
-    return { ok: false, message: 'Paste a link to shorten.' }
+    return { ok: false, message: 'Paste a link.' }
   }
 
   if (/\s/.test(value)) {
-    return { ok: false, message: 'Links can’t contain spaces. Check that you pasted one link.' }
+    return { ok: false, message: 'Links can’t contain spaces.' }
   }
 
   if (!HAS_SCHEME.test(value) && OTHER_SCHEME.test(value)) {
-    return { ok: false, message: 'Only web links (http or https) can be shortened.' }
+    return { ok: false, message: 'Only http and https links work.' }
   }
 
   const withScheme = HAS_SCHEME.test(value) ? value : `https://${value}`
@@ -24,11 +24,11 @@ export function checkUrl(input: string): UrlCheck {
   try {
     parsed = new URL(withScheme)
   } catch {
-    return { ok: false, message: 'That isn’t a valid link. Try something like example.com/deal.' }
+    return { ok: false, message: 'That isn’t a valid link.' }
   }
 
   if (parsed.protocol !== 'http:' && parsed.protocol !== 'https:') {
-    return { ok: false, message: 'Only web links (http or https) can be shortened.' }
+    return { ok: false, message: 'Only http and https links work.' }
   }
 
   const host = parsed.hostname
@@ -36,7 +36,7 @@ export function checkUrl(input: string): UrlCheck {
   if (!looksLikeHost) {
     return {
       ok: false,
-      message: `“${host || value}” is missing a domain ending like .com. Try something like example.com/deal.`,
+      message: `“${host || value}” is missing a domain like .com.`,
     }
   }
 
