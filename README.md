@@ -1,6 +1,17 @@
-<img src="assets/icon.svg" width="64" height="64" alt="">
+<div>
+  <p align="center">
+    <img src="public/favicon.svg" alt="" width="128" height="128" />
+  </p>
 
-# dealseek-link-shortener
+  <h1 align="center">DealSeek links</h1>
+
+  <p align="center">
+    A copy-first link shortener for DealSeek deals. <br>
+    Paste a long link, get a short one to share anywhere.
+    <br />
+    <a href="https://link.oli.boo">link.oli.boo</a>
+  </p>
+</div>
 
 ## How it works
 
