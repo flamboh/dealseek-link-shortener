@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react'
+import { useRef, useState, type CSSProperties } from 'react'
 import { LayoutGroup, MotionConfig } from 'motion/react'
 import { LinkForm, type Problem } from './components/LinkForm'
 import { RecentLinks } from './components/RecentLinks'
@@ -65,8 +65,10 @@ export default function App() {
 
   return (
     <main className="mx-auto flex w-full max-w-md flex-col px-4 pt-[16vh] pb-16">
-      <Wordmark />
-      <div className="mt-10">
+      <div className="load-in" style={{ '--i': 0 } as CSSProperties}>
+        <Wordmark />
+      </div>
+      <div className="load-in mt-10" style={{ '--i': 1 } as CSSProperties}>
         <LinkForm
           value={input}
           onValueChange={handleValueChange}
@@ -86,11 +88,9 @@ export default function App() {
               </>
             )}
           </div>
-          {earlier.length > 0 && (
-            <div className="mt-10">
-              <RecentLinks links={earlier} arrivingCode={arrivingCode} />
-            </div>
-          )}
+          <div className={earlier.length > 0 ? 'load-in mt-10' : 'load-in'} style={{ '--i': 2 } as CSSProperties}>
+            {earlier.length > 0 && <RecentLinks links={earlier} arrivingCode={arrivingCode} />}
+          </div>
         </LayoutGroup>
       </MotionConfig>
     </main>
