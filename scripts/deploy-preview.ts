@@ -2,6 +2,7 @@ import { appendFileSync } from 'node:fs'
 
 const WORKER_NAME = 'dealseek-link-shortener-preview'
 const STATS_WORKER_CONFIG = 'dist/dealseek_link_stats/wrangler.json'
+const GUARD_WORKER_CONFIG = 'dist/dealseek_link_guard/wrangler.json'
 const MAX_ALIAS_LENGTH = 63 - WORKER_NAME.length - 1
 
 async function attempt(cmd: string[], env: Record<string, string> = {}): Promise<{ ok: boolean; output: string }> {
@@ -40,6 +41,7 @@ console.log(`Preview alias: ${alias}`)
 await run(['bunx', 'wrangler', 'd1', 'migrations', 'apply', 'DB', '--remote', '--env', 'preview', '--config', 'wrangler.jsonc'])
 await run(['bun', 'run', 'build'], { CLOUDFLARE_ENV: 'preview' })
 await run(['bunx', 'wrangler', 'deploy', '--config', STATS_WORKER_CONFIG])
+await run(['bunx', 'wrangler', 'deploy', '--config', GUARD_WORKER_CONFIG])
 const upload = ['bunx', 'wrangler', 'versions', 'upload', '--preview-alias', alias]
 let result = await attempt(upload)
 if (!result.ok && result.output.includes('does not yet exist')) {

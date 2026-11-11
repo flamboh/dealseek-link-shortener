@@ -20,6 +20,8 @@ export default function App() {
   const { current, history, arrivingCode, cameFromRecent, removingCodes } = useLinkState()
   const inFlight = useRef(false)
   const noticeTimer = useRef<number | undefined>(undefined)
+  const waitTimer = useRef<number | undefined>(undefined)
+  const [waitLeft, setWaitLeft] = useState<number | null>(null)
   const inputRef = useRef<HTMLInputElement>(null)
 
   const earlier = history.filter((link) => link.code !== current?.code)
@@ -35,8 +37,25 @@ export default function App() {
     setAlreadyShortened(false)
   }
 
+  const startWait = (seconds: number) => {
+    window.clearInterval(waitTimer.current)
+    const until = Date.now() + seconds * 1000
+    setWaitLeft(seconds)
+    waitTimer.current = window.setInterval(() => {
+      const left = Math.ceil((until - Date.now()) / 1000)
+      if (left > 0) {
+        setWaitLeft(left)
+        return
+      }
+      window.clearInterval(waitTimer.current)
+      waitTimer.current = undefined
+      setWaitLeft(null)
+      setProblem((previous) => (previous?.kind === 'rate-limited' ? { kind: 'available-again' } : previous))
+    }, 1000)
+  }
+
   const submit = async () => {
-    if (inFlight.current) return
+    if (inFlight.current || waitTimer.current !== undefined) return
 
     const check = checkUrl(input)
     if (!check.ok) {
@@ -75,6 +94,7 @@ export default function App() {
       inputRef.current?.focus()
     } else if (result.kind === 'rate-limited') {
       setProblem({ kind: 'rate-limited', message: result.message, retryAfter: result.retryAfter })
+      if (result.retryAfter) startWait(result.retryAfter)
     } else {
       setProblem({ kind: 'unavailable' })
     }
@@ -87,7 +107,7 @@ export default function App() {
 
   const handleValueChange = (value: string) => {
     setInput(value)
-    if (problem) setProblem(null)
+    if (problem && waitTimer.current === undefined) setProblem(null)
     if (alreadyShortened && !isCurrentLink(value)) hideAlreadyShortened()
   }
 
@@ -103,6 +123,7 @@ export default function App() {
           onSubmit={() => void submit()}
           pending={pending}
           problem={problem}
+          waitLeft={waitLeft}
           alreadyShortened={alreadyShortened}
           inputRef={inputRef}
         />

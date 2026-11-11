@@ -7,11 +7,13 @@ import { Button } from './ui/button'
 import { Input } from './ui/input'
 import { cn } from '../lib/utils'
 import { linkTransition } from './motion'
+import { tooManyLinksMessage } from '../../shared/wait'
 
 export type Problem =
   | { kind: 'invalid'; message: string }
   | { kind: 'rate-limited'; message: string; retryAfter: number | null }
   | { kind: 'unavailable' }
+  | { kind: 'available-again' }
   | null
 
 type LinkFormProps = {
@@ -20,6 +22,7 @@ type LinkFormProps = {
   onSubmit: () => void
   pending: boolean
   problem: Problem
+  waitLeft: number | null
   alreadyShortened: boolean
   inputRef: RefObject<HTMLInputElement | null>
 }
@@ -30,6 +33,7 @@ export function LinkForm({
   onSubmit,
   pending,
   problem,
+  waitLeft,
   alreadyShortened,
   inputRef,
 }: LinkFormProps) {
@@ -87,8 +91,19 @@ export function LinkForm({
             )}
           </AnimatePresence>
         </div>
-        <p id="url-problem" aria-live="polite" className="min-h-5 pt-1 text-xs leading-4 text-destructive">
-          {(problem?.kind === 'invalid' || problem?.kind === 'rate-limited') && problem.message}
+        {waitLeft !== null && (
+          <p aria-hidden="true" className="pt-1 text-xs leading-4 text-destructive">
+            {tooManyLinksMessage(waitLeft)}
+          </p>
+        )}
+        <p
+          id="url-problem"
+          role="status"
+          className={cn('pt-1 text-xs leading-4 text-destructive', waitLeft === null ? 'min-h-5' : 'sr-only')}
+        >
+          {problem?.kind === 'invalid' && problem.message}
+          {problem?.kind === 'rate-limited' && problem.message}
+          {problem?.kind === 'available-again' && <span className="sr-only">You can make links again.</span>}
           {problem?.kind === 'unavailable' && (
             <>
               Couldn’t reach the server.{' '}
@@ -106,7 +121,7 @@ export function LinkForm({
       <Button
         type="submit"
         size="icon"
-        disabled={!value.trim() && !pending}
+        disabled={(!value.trim() && !pending) || waitLeft !== null}
         aria-label="Shorten"
         aria-busy={pending || undefined}
         className="size-10 rounded-lg"
