@@ -1,1 +1,92 @@
 @import "tailwindcss";
+
+@custom-variant dark (@media (prefers-color-scheme: dark));
+
+@theme inline {
+  --font-sans:
+    "Plus Jakarta Sans", ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+    Roboto, "Helvetica Neue", Arial, sans-serif;
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary-hover: var(--primary-hover);
+  --color-brand: var(--brand);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-destructive: var(--destructive);
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+}
+
+:root {
+  --ds-orange: #e5541a;
+  --ds-orange-bright: #ff6523;
+  --radius: 0.125rem;
+  --background: #ffffff;
+  --foreground: #171717;
+  --card: #ffffff;
+  --card-foreground: #171717;
+  --popover: #ffffff;
+  --popover-foreground: #171717;
+  --primary: var(--ds-orange-bright);
+  --primary-foreground: #171717;
+  --primary-hover: color-mix(in srgb, #ff6523 80%, #71330a);
+  --brand: var(--ds-orange);
+  --muted: #f7f7f7;
+  --muted-foreground: #5c5c5c;
+  --accent: color-mix(in srgb, #ff6523 10%, transparent);
+  --accent-foreground: #171717;
+  --border: #ebebeb;
+  --input: #d1d1d1;
+  --ring: #ff6523;
+  --destructive: #e93544;
+  color-scheme: light;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #171717;
+    --foreground: #ffffff;
+    --card: #1c1c1c;
+    --card-foreground: #ffffff;
+    --popover: #292929;
+    --popover-foreground: #ffffff;
+    --brand: var(--ds-orange-bright);
+    --muted: #292929;
+    --muted-foreground: #a3a3a3;
+    --accent-foreground: #ffffff;
+    --border: #333333;
+    --input: #3d3d3d;
+    --destructive: #fb3748;
+    color-scheme: dark;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+
+  html,
+  body,
+  #root {
+    min-height: 100svh;
+  }
+
+  body {
+    @apply bg-background font-sans text-foreground antialiased;
+    font-weight: 500;
+  }
+}
