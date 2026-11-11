@@ -11,11 +11,11 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "preview": "vite preview",
-    "cf-typegen": "wrangler types -c wrangler.jsonc -c wrangler.stats.jsonc",
+    "cf-typegen": "wrangler types -c wrangler.jsonc -c wrangler.stats.jsonc -c guard/wrangler.jsonc",
     "db:migrate:local": "wrangler d1 migrations apply DB --local --config wrangler.jsonc",
     "db:migrate:preview": "wrangler d1 migrations apply DB --remote --env preview --config wrangler.jsonc",
     "db:migrate:prod": "wrangler d1 migrations apply DB --remote --config wrangler.jsonc",
-    "deploy": "bun run db:migrate:prod && bun run build && wrangler deploy --config dist/dealseek_link_stats/wrangler.json && wrangler deploy",
+    "deploy": "bun run db:migrate:prod && bun run build && wrangler deploy --config dist/dealseek_link_stats/wrangler.json && wrangler deploy --config dist/dealseek_link_guard/wrangler.json && wrangler deploy",
     "deploy:preview": "bun scripts/deploy-preview.ts"
   },
   "dependencies": {
