@@ -52,17 +52,19 @@ export function LinkSummary({ link, prominent = false }: LinkSummaryProps) {
           {displayUrl(link.url)}
         </motion.p>
       </div>
-      <motion.div layoutId={`${link.code}:open`} layout="position" className="relative">
-        <a
-          href={link.shortUrl}
-          target="_blank"
-          rel="noopener noreferrer"
-          aria-label={`Open ${link.shortUrl} in a new tab`}
-          className="inline-flex size-8 items-center justify-center rounded-md text-muted-foreground outline-none transition-colors duration-100 hover:bg-accent hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring active:bg-border dark:hover:bg-accent/50 dark:active:bg-accent"
-        >
-          <HugeiconsIcon icon={ArrowUpRight01Icon} strokeWidth={2} className="size-4" />
-        </a>
-      </motion.div>
+      {!prominent && (
+        <motion.div layoutId={`${link.code}:open`} layout="position" className="relative">
+          <a
+            href={link.shortUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label={`Open ${link.shortUrl} in a new tab`}
+            className="inline-flex size-8 items-center justify-center rounded-md text-muted-foreground outline-none transition-colors duration-100 hover:bg-accent hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring active:bg-border dark:hover:bg-accent/50 dark:active:bg-accent"
+          >
+            <HugeiconsIcon icon={ArrowUpRight01Icon} strokeWidth={2} className="size-4" />
+          </a>
+        </motion.div>
+      )}
     </>
   )
 }
