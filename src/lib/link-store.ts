@@ -1,5 +1,5 @@
 import { useSyncExternalStore } from 'react'
-import type { ShortLink } from './api'
+import { fetchStats, type LinkStats, type ShortLink } from './api'
 import { addToHistory, loadHistory, saveHistory } from './history'
 
 export type LinkState = {
@@ -7,14 +7,21 @@ export type LinkState = {
   history: ShortLink[]
   arrivingCode: string | null
   cameFromRecent: boolean
+  stats: Record<string, LinkStats>
 }
 
 let state: LinkState | null = null
+let loadingStats = false
 const listeners = new Set<() => void>()
 
 function getState(): LinkState {
-  state ??= { current: null, history: loadHistory(), arrivingCode: null, cameFromRecent: false }
+  state ??= { current: null, history: loadHistory(), arrivingCode: null, cameFromRecent: false, stats: {} }
   return state
+}
+
+function withFreshStats(stats: Record<string, LinkStats>, link: ShortLink): Record<string, LinkStats> {
+  if (!link.ownerToken || stats[link.code]) return stats
+  return { ...stats, [link.code]: { clicks: 0, visitors: 0 } }
 }
 
 function setState(next: LinkState) {
@@ -23,10 +30,31 @@ function setState(next: LinkState) {
   for (const listener of listeners) listener()
 }
 
+export async function refreshStats() {
+  if (loadingStats) return
+  loadingStats = true
+  const next = await fetchStats(getState().history)
+  loadingStats = false
+  if (next) setState({ ...getState(), stats: { ...getState().stats, ...next } })
+}
+
+function refreshWhenVisible() {
+  if (document.visibilityState === 'visible') void refreshStats()
+}
+
 function subscribe(listener: () => void) {
   listeners.add(listener)
+  if (listeners.size === 1) {
+    window.addEventListener('focus', refreshWhenVisible)
+    document.addEventListener('visibilitychange', refreshWhenVisible)
+    void refreshStats()
+  }
   return () => {
     listeners.delete(listener)
+    if (listeners.size === 0) {
+      window.removeEventListener('focus', refreshWhenVisible)
+      document.removeEventListener('visibilitychange', refreshWhenVisible)
+    }
   }
 }
 
@@ -34,21 +62,31 @@ export function useLinkState(): LinkState {
   return useSyncExternalStore(subscribe, getState, getState)
 }
 
+export function useLinkStats(code: string): LinkStats | undefined {
+  const getStats = () => getState().stats[code]
+  return useSyncExternalStore(subscribe, getStats, getStats)
+}
+
 export function showLink(link: ShortLink) {
-  const { current, history } = getState()
+  const { current, history, stats } = getState()
   if (current?.code === link.code) return
   setState({
     current: link,
     history: addToHistory(history, link),
     arrivingCode: current?.code ?? null,
     cameFromRecent: history.some((item) => item.code === link.code),
+    stats: withFreshStats(stats, link),
   })
 }
 
 export function addEarlierLink(link: ShortLink) {
-  const { current, history } = getState()
+  const { current, history, stats } = getState()
   const withLink = addToHistory(history, link)
-  setState({ ...getState(), history: current ? addToHistory(withLink, current) : withLink })
+  setState({
+    ...getState(),
+    history: current ? addToHistory(withLink, current) : withLink,
+    stats: withFreshStats(stats, link),
+  })
 }
 
 export function clearCurrent() {
@@ -56,5 +94,5 @@ export function clearCurrent() {
 }
 
 export function clearHistory() {
-  setState({ current: null, history: [], arrivingCode: null, cameFromRecent: false })
+  setState({ current: null, history: [], arrivingCode: null, cameFromRecent: false, stats: {} })
 }

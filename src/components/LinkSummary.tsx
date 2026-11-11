@@ -4,7 +4,8 @@ import { HugeiconsIcon } from '@hugeicons/react'
 import { ArrowUpRight01Icon } from '@hugeicons/core-free-icons'
 import type { ShortLink } from '../lib/api'
 import { copyText } from '../lib/clipboard'
-import { displayUrl } from '../lib/format'
+import { displayUrl, formatStats } from '../lib/format'
+import { useLinkStats } from '../lib/link-store'
 import { showToast } from '../lib/toast'
 import { cn } from '../lib/utils'
 
@@ -15,6 +16,7 @@ type LinkSummaryProps = {
 
 export function LinkSummary({ link, prominent = false }: LinkSummaryProps) {
   const shortRef = useRef<HTMLSpanElement>(null)
+  const stats = useLinkStats(link.code)
 
   const copy = async () => {
     if (await copyText(link.shortUrl)) {
@@ -51,6 +53,15 @@ export function LinkSummary({ link, prominent = false }: LinkSummaryProps) {
         >
           {displayUrl(link.url)}
         </motion.p>
+        {link.ownerToken && (
+          <motion.p
+            layoutId={`${link.code}:stats`}
+            layout="position"
+            className="mt-0.5 text-xs leading-4 text-muted-foreground/80 tabular-nums"
+          >
+            {stats ? formatStats(stats) : '\u00a0'}
+          </motion.p>
+        )}
       </div>
       {!prominent && (
         <motion.div layoutId={`${link.code}:open`} layout="position" className="relative">
