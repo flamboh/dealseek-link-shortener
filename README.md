@@ -2,8 +2,6 @@
 
 # dealseek-link-shortener
 
-Created in [T3 Code](https://t3.codes).
-
 ## How it works
 
 One Cloudflare Worker serves the React app and the API.
