@@ -1,10 +1,15 @@
 import { shouldCountClick } from './bots'
+import { tooManyLinksMessage } from '../shared/wait'
 import { kvLinkCache } from './cache'
+import { clientKey } from './client-key'
 import { isCode } from './codes'
+import { checkCreateLimit, lookupMissAllowed } from './limits'
 import { createLink, resolveLink, revokeLink } from './links'
-import { NOT_FOUND_HTML, REVOKED_HTML } from './pages'
+import { NOT_FOUND_HTML, REVOKED_HTML, TOO_MANY_LOOKUPS_HTML } from './pages'
 import { parseStatsRequest, readStats, recordClick } from './stats'
 import { checkUrl } from './validate'
+
+const LOOKUP_RETRY_AFTER_SECONDS = 60
 
 function json(body: unknown, status: number, headers: HeadersInit = {}): Response {
   return Response.json(body, { status, headers: { 'cache-control': 'no-store', ...headers } })
@@ -15,6 +20,12 @@ function htmlPage(html: string, status: number): Response {
     status,
     headers: { 'content-type': 'text/html; charset=utf-8', 'cache-control': 'no-store' },
   })
+}
+
+function tooManyLookupsPage(): Response {
+  const response = htmlPage(TOO_MANY_LOOKUPS_HTML, 429)
+  response.headers.set('retry-after', String(LOOKUP_RETRY_AFTER_SECONDS))
+  return response
 }
 
 function bearerToken(request: Request): string | null {
@@ -41,6 +52,13 @@ async function handleCreate(request: Request, env: Env): Promise<Response> {
   const origin = new URL(request.url)
   const check = checkUrl(input, origin.hostname)
   if (!check.ok) return json({ error: check.error }, 400)
+
+  const decision = await checkCreateLimit(env.CREATE_LIMITER, clientKey(request))
+  if (!decision.allowed) {
+    return json({ error: tooManyLinksMessage(decision.retryAfter), retryAfter: decision.retryAfter }, 429, {
+      'retry-after': String(decision.retryAfter),
+    })
+  }
 
   const link = await createLink(env.DB, kvLinkCache(env.LINK_CACHE), check.url)
   return json(
@@ -106,7 +124,6 @@ export default {
     const code = pathname.slice(1)
     if ((request.method === 'GET' || request.method === 'HEAD') && isCode(code)) {
       const link = await resolveLink(env.DB, kvLinkCache(env.LINK_CACHE), code, (p) => ctx.waitUntil(p))
-      if (link.status === 'revoked') return htmlPage(REVOKED_HTML, 410)
       if (link.status === 'active') {
         if (shouldCountClick(request)) {
           ctx.waitUntil(
@@ -117,6 +134,8 @@ export default {
         }
         return new Response(null, { status: 302, headers: { location: link.url, 'cache-control': 'no-store' } })
       }
+      if (!(await lookupMissAllowed(env.LOOKUP_LIMITER, clientKey(request)))) return tooManyLookupsPage()
+      if (link.status === 'revoked') return htmlPage(REVOKED_HTML, 410)
     }
 
     return htmlPage(NOT_FOUND_HTML, 404)

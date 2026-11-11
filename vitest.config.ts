@@ -10,12 +10,15 @@ export default defineConfig(async () => {
         wrangler: { configPath: './wrangler.jsonc' },
         miniflare: {
           bindings: { TEST_MIGRATIONS: migrations, VISITOR_SALT: 'test-salt' },
-          durableObjects: { LINK_STATS: { className: 'LinkStats', useSQLite: true } },
+          durableObjects: {
+            LINK_STATS: { className: 'LinkStats', useSQLite: true },
+            CREATE_LIMITER: { className: 'CreateLimiter', useSQLite: true },
+          },
         },
       }),
     ],
     test: {
-      include: ['worker/**/*.test.ts'],
+      include: ['worker/**/*.test.ts', 'guard/**/*.test.ts', 'shared/**/*.test.ts'],
       setupFiles: ['./worker/test/apply-migrations.ts'],
     },
   }

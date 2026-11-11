@@ -86,7 +86,7 @@ describe('click recording', () => {
         },
       },
     } as unknown as Env
-    const response = await send(`/${link.code}`, { headers: { 'user-agent': SAFARI } }, broken)
+    const response = await send(`/${link.code}`, { headers: { 'user-agent': SAFARI } }, { env: broken })
     expect(response.status).toBe(302)
     expect(response.headers.get('location')).toBe('https://example.com/still-works')
   })
@@ -97,7 +97,7 @@ describe('click recording', () => {
       ...env,
       LINK_STATS: { getByName: () => ({ record: () => Promise.reject(new Error('write failed')) }) },
     } as unknown as Env
-    const response = await send(`/${link.code}`, { headers: { 'user-agent': SAFARI } }, broken)
+    const response = await send(`/${link.code}`, { headers: { 'user-agent': SAFARI } }, { env: broken })
     expect(response.status).toBe(302)
   })
 })
