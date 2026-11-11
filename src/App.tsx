@@ -3,6 +3,7 @@ import { LayoutGroup, MotionConfig } from 'motion/react'
 import { LinkForm, type Problem } from './components/LinkForm'
 import { RecentLinks } from './components/RecentLinks'
 import { ShortLinkResult } from './components/ShortLinkResult'
+import { Toaster } from './components/Toaster'
 import { Wordmark } from './components/Wordmark'
 import { linkTransition } from './components/motion'
 import { shortenLink } from './lib/api'
@@ -120,6 +121,7 @@ export default function App() {
             {earlier.length > 0 && <RecentLinks links={earlier} arrivingCode={arrivingCode} />}
           </div>
         </LayoutGroup>
+        <Toaster />
       </MotionConfig>
     </main>
   )
