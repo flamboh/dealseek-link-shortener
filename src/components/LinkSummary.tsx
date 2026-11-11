@@ -1,6 +1,4 @@
 import { motion } from 'motion/react'
-import { HugeiconsIcon } from '@hugeicons/react'
-import { LinkSquare02Icon } from '@hugeicons/core-free-icons'
 import type { ShortLink } from '../lib/api'
 import { displayUrl } from '../lib/format'
 import { cn } from '../lib/utils'
@@ -31,14 +29,6 @@ export function LinkSummary({ link, prominent = false }: LinkSummaryProps) {
             {displayUrl(link.shortUrl)}
           </motion.span>
           <span className="sr-only"> (opens in a new tab)</span>
-          {prominent && (
-            <HugeiconsIcon
-              icon={LinkSquare02Icon}
-              strokeWidth={2}
-              aria-hidden="true"
-              className="size-3.5 shrink-0 text-muted-foreground transition-colors duration-150 group-hover/link:text-foreground"
-            />
-          )}
         </a>
         <motion.p
           layoutId={`${link.code}:url`}

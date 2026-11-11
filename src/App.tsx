@@ -7,6 +7,7 @@ import { Wordmark } from './components/Wordmark'
 import { linkTransition } from './components/motion'
 import { shortenLink } from './lib/api'
 import { showNewLink, useLinkState } from './lib/link-store'
+import { cn } from './lib/utils'
 import { checkUrl, sameUrl } from './lib/validate-url'
 
 export default function App() {
@@ -82,7 +83,7 @@ export default function App() {
       </div>
       <MotionConfig reducedMotion="user" transition={linkTransition}>
         <LayoutGroup>
-          <div aria-live="polite" className="mt-2">
+          <div aria-live="polite">
             {current && (
               <>
                 <p className="sr-only">Short link ready: {current.shortUrl}</p>
@@ -90,7 +91,7 @@ export default function App() {
               </>
             )}
           </div>
-          <div className={earlier.length > 0 ? 'load-in mt-10' : 'load-in'} style={{ '--i': 2 } as CSSProperties}>
+          <div className={cn('load-in', earlier.length > 0 && (current ? 'mt-8' : 'mt-3'))} style={{ '--i': 2 } as CSSProperties}>
             {earlier.length > 0 && <RecentLinks links={earlier} arrivingCode={arrivingCode} />}
           </div>
         </LayoutGroup>
