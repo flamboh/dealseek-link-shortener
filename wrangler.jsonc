@@ -1,0 +1,35 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "dealseek-link-shortener",
+  "main": "worker/index.ts",
+  "compatibility_date": "2026-11-01",
+  "workers_dev": true,
+  "preview_urls": true,
+  "observability": { "enabled": true },
+  "assets": { "binding": "ASSETS" },
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "dealseek-links",
+      "database_id": "aef7f39c-5ec4-4102-bab8-7facc04ca6fc",
+      "migrations_dir": "migrations"
+    }
+  ],
+  "kv_namespaces": [{ "binding": "LINK_CACHE", "id": "454ed23974604326abb36c8136e5ef44" }],
+  "env": {
+    "preview": {
+      "name": "dealseek-link-shortener-preview",
+      "workers_dev": true,
+      "preview_urls": true,
+          "d1_databases": [
+        {
+          "binding": "DB",
+          "database_name": "dealseek-links-preview",
+          "database_id": "2b4c4e72-efd6-4a65-8625-11595e3b9c3c",
+          "migrations_dir": "migrations"
+        }
+      ],
+      "kv_namespaces": [{ "binding": "LINK_CACHE", "id": "5010d48ab52d4a0aa6d5b6a540544f70" }]
+    }
+  }
+}
