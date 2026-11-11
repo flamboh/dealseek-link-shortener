@@ -42,3 +42,11 @@ export function checkUrl(input: string): UrlCheck {
 
   return { ok: true, url: withScheme }
 }
+
+export function sameUrl(a: string, b: string): boolean {
+  try {
+    return new URL(a).href === new URL(b).href
+  } catch {
+    return a === b
+  }
+}

@@ -7,7 +7,7 @@ import { Wordmark } from './components/Wordmark'
 import { linkTransition } from './components/motion'
 import { shortenLink, type ShortLink } from './lib/api'
 import { addToHistory, loadHistory, saveHistory } from './lib/history'
-import { checkUrl } from './lib/validate-url'
+import { checkUrl, sameUrl } from './lib/validate-url'
 
 export default function App() {
   const [input, setInput] = useState('')
@@ -28,6 +28,12 @@ export default function App() {
     if (!check.ok) {
       setProblem({ kind: 'invalid', message: check.message })
       inputRef.current?.focus()
+      return
+    }
+
+    if (current && sameUrl(current.url, check.url)) {
+      setProblem(null)
+      setInput('')
       return
     }
 
