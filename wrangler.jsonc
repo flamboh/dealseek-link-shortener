@@ -17,13 +17,17 @@
     }
   ],
   "kv_namespaces": [{ "binding": "LINK_CACHE", "id": "454ed23974604326abb36c8136e5ef44" }],
+  "durable_objects": {
+    "bindings": [{ "name": "LINK_STATS", "class_name": "LinkStats", "script_name": "dealseek-link-stats" }]
+  },
+  "secrets": { "required": ["VISITOR_SALT"] },
   "env": {
     "preview": {
       "name": "dealseek-link-shortener-preview",
       "routes": [],
       "workers_dev": true,
       "preview_urls": true,
-          "d1_databases": [
+      "d1_databases": [
         {
           "binding": "DB",
           "database_name": "dealseek-links-preview",
@@ -31,7 +35,11 @@
           "migrations_dir": "migrations"
         }
       ],
-      "kv_namespaces": [{ "binding": "LINK_CACHE", "id": "5010d48ab52d4a0aa6d5b6a540544f70" }]
+      "kv_namespaces": [{ "binding": "LINK_CACHE", "id": "5010d48ab52d4a0aa6d5b6a540544f70" }],
+      "durable_objects": {
+        "bindings": [{ "name": "LINK_STATS", "class_name": "LinkStats", "script_name": "dealseek-link-stats-preview" }]
+      },
+      "secrets": { "required": ["VISITOR_SALT"] }
     }
   }
 }

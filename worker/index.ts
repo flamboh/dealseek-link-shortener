@@ -1,7 +1,9 @@
+import { shouldCountClick } from './bots'
 import { kvLinkCache } from './cache'
 import { isCode } from './codes'
 import { createLink, resolveLink } from './links'
 import { NOT_FOUND_HTML } from './pages'
+import { parseStatsRequest, readStats, recordClick } from './stats'
 import { checkUrl } from './validate'
 
 function json(body: unknown, status: number, headers: HeadersInit = {}): Response {
@@ -34,9 +36,22 @@ async function handleCreate(request: Request, env: Env): Promise<Response> {
       shortUrl: `${origin.origin}/${link.code}`,
       url: link.url,
       createdAt: new Date(link.createdAt).toISOString(),
+      ownerToken: link.ownerToken,
     },
     201,
   )
+}
+
+async function handleStats(request: Request, env: Env): Promise<Response> {
+  let body: unknown
+  try {
+    body = await request.json()
+  } catch {
+    body = null
+  }
+  const parsed = parseStatsRequest(body)
+  if (!parsed.ok) return json({ error: parsed.error }, 400)
+  return json({ stats: await readStats(env.DB, env.LINK_STATS, parsed.links) }, 200)
 }
 
 export default {
@@ -53,12 +68,29 @@ export default {
       }
     }
 
+    if (pathname === '/api/stats') {
+      if (request.method !== 'POST') return json({ error: 'Method not allowed.' }, 405, { allow: 'POST' })
+      try {
+        return await handleStats(request, env)
+      } catch (error) {
+        console.error('read stats failed', error)
+        return json({ error: 'Could not load stats right now.' }, 500)
+      }
+    }
+
     if (pathname.startsWith('/api/')) return json({ error: 'Not found.' }, 404)
 
     const code = pathname.slice(1)
     if ((request.method === 'GET' || request.method === 'HEAD') && isCode(code)) {
       const url = await resolveLink(env.DB, kvLinkCache(env.LINK_CACHE), code, (p) => ctx.waitUntil(p))
       if (url) {
+        if (shouldCountClick(request)) {
+          ctx.waitUntil(
+            recordClick(env.LINK_STATS, code, request, env.VISITOR_SALT).catch((error: unknown) =>
+              console.error('record click failed', code, error),
+            ),
+          )
+        }
         return new Response(null, { status: 302, headers: { location: url, 'cache-control': 'no-store' } })
       }
     }

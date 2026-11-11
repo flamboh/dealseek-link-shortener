@@ -6,8 +6,12 @@ export default defineConfig(async () => {
   return {
     plugins: [
       cloudflareTest({
+        main: './worker/test/entry.ts',
         wrangler: { configPath: './wrangler.jsonc' },
-        miniflare: { bindings: { TEST_MIGRATIONS: migrations } },
+        miniflare: {
+          bindings: { TEST_MIGRATIONS: migrations, VISITOR_SALT: 'test-salt' },
+          durableObjects: { LINK_STATS: { className: 'LinkStats', useSQLite: true } },
+        },
       }),
     ],
     test: {
