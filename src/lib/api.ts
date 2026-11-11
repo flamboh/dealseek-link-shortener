@@ -122,3 +122,19 @@ export async function fetchStats(links: ShortLink[]): Promise<Record<string, Lin
   if (typeof stats !== 'object' || stats === null) return null
   return Object.fromEntries(Object.entries(stats).filter((entry): entry is [string, LinkStats] => isLinkStats(entry[1])))
 }
+
+export async function revokeLink(link: ShortLink): Promise<boolean> {
+  const token = link.ownerToken
+  if (!token) return false
+  const send: SendRequest = () =>
+    fetch(`/api/links/${encodeURIComponent(link.code)}`, {
+      method: 'DELETE',
+      headers: { Authorization: `Bearer ${token}` },
+    })
+  try {
+    const response = await (import.meta.env.DEV && devRequestHook.intercept ? devRequestHook.intercept(send) : send())
+    return response.status === 204
+  } catch {
+    return false
+  }
+}

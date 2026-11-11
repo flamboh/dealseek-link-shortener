@@ -28,6 +28,7 @@ One Cloudflare Worker serves the React app and the API.
 - A visitor is a SHA-256 hash of IP + User-Agent + the `VISITOR_SALT` secret. The IP and User-Agent are never stored.
 - Clicks are recorded after the redirect is sent, so they never slow it down. HEAD requests, prefetches, and link-preview bots (`worker/bots.ts`) are not counted.
 - Creating a link returns an `ownerToken`. Only its hash is stored. The browser keeps the token in its history, so only the browser that made a link can read its stats.
+- `DELETE /api/links/<code>` with `Authorization: Bearer <ownerToken>` revokes a link (204). A wrong token or unknown code gets the same 404. The row stays in D1 with `revoked_at` set, so the code is never reused, and the redirect returns a 410 page. KV keeps a `revoked` tombstone so repeat hits don't reach D1.
 - `POST /api/stats` with `{ "links": [{ "code": "...", "token": "..." }] }` (up to 50) returns `{ "stats": { "<code>": { "clicks": 5, "visitors": 2 } } }`. Codes with a wrong or missing token are left out.
 
 ## Develop
