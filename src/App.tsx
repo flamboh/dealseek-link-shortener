@@ -5,17 +5,15 @@ import { RecentLinks } from './components/RecentLinks'
 import { ShortLinkResult } from './components/ShortLinkResult'
 import { Wordmark } from './components/Wordmark'
 import { linkTransition } from './components/motion'
-import { shortenLink, type ShortLink } from './lib/api'
-import { addToHistory, loadHistory, saveHistory } from './lib/history'
+import { shortenLink } from './lib/api'
+import { showNewLink, useLinkState } from './lib/link-store'
 import { checkUrl, sameUrl } from './lib/validate-url'
 
 export default function App() {
   const [input, setInput] = useState('')
   const [pending, setPending] = useState(false)
   const [problem, setProblem] = useState<Problem>(null)
-  const [current, setCurrent] = useState<ShortLink | null>(null)
-  const [history, setHistory] = useState<ShortLink[]>(loadHistory)
-  const [arrivingCode, setArrivingCode] = useState<string | null>(null)
+  const { current, history, arrivingCode } = useLinkState()
   const inFlight = useRef(false)
   const inputRef = useRef<HTMLInputElement>(null)
 
@@ -47,11 +45,7 @@ export default function App() {
     setPending(false)
 
     if (result.ok) {
-      const next = addToHistory(history, result.link)
-      saveHistory(next)
-      setHistory(next)
-      setArrivingCode(current?.code ?? null)
-      setCurrent(result.link)
+      showNewLink(result.link)
       setInput('')
       return
     }
@@ -59,6 +53,8 @@ export default function App() {
     if (result.kind === 'rejected') {
       setProblem({ kind: 'invalid', message: result.message })
       inputRef.current?.focus()
+    } else if (result.kind === 'rate-limited') {
+      setProblem({ kind: 'rate-limited', message: result.message, retryAfter: result.retryAfter })
     } else {
       setProblem({ kind: 'unavailable' })
     }

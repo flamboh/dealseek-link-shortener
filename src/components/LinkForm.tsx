@@ -5,7 +5,11 @@ import { loaderCircleIcon } from './icons/loader-circle'
 import { Button } from './ui/button'
 import { Input } from './ui/input'
 
-export type Problem = { kind: 'invalid'; message: string } | { kind: 'unavailable' } | null
+export type Problem =
+  | { kind: 'invalid'; message: string }
+  | { kind: 'rate-limited'; message: string; retryAfter: number | null }
+  | { kind: 'unavailable' }
+  | null
 
 type LinkFormProps = {
   value: string
@@ -50,7 +54,7 @@ export function LinkForm({ value, onValueChange, onSubmit, pending, problem, inp
           />
         </div>
         <p id="url-problem" aria-live="polite" className="min-h-5 pt-1 text-xs leading-4 text-destructive">
-          {problem?.kind === 'invalid' && problem.message}
+          {(problem?.kind === 'invalid' || problem?.kind === 'rate-limited') && problem.message}
           {problem?.kind === 'unavailable' && (
             <>
               Couldn’t reach the server.{' '}
