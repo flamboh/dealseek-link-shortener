@@ -20,6 +20,7 @@
   "env": {
     "preview": {
       "name": "dealseek-link-shortener-preview",
+      "routes": [],
       "workers_dev": true,
       "preview_urls": true,
           "d1_databases": [
