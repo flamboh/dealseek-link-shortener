@@ -1,9 +1,10 @@
 import { useRef, useState } from 'react'
+import { LayoutGroup, MotionConfig } from 'motion/react'
 import { LinkForm, type Problem } from './components/LinkForm'
 import { RecentLinks } from './components/RecentLinks'
 import { ShortLinkResult } from './components/ShortLinkResult'
 import { Wordmark } from './components/Wordmark'
-import { Toaster } from './components/ui/sonner'
+import { linkTransition } from './components/motion'
 import { shortenLink, type ShortLink } from './lib/api'
 import { addToHistory, loadHistory, saveHistory } from './lib/history'
 import { checkUrl } from './lib/validate-url'
@@ -14,6 +15,7 @@ export default function App() {
   const [problem, setProblem] = useState<Problem>(null)
   const [current, setCurrent] = useState<ShortLink | null>(null)
   const [history, setHistory] = useState<ShortLink[]>(loadHistory)
+  const [arrivingCode, setArrivingCode] = useState<string | null>(null)
   const inFlight = useRef(false)
   const inputRef = useRef<HTMLInputElement>(null)
 
@@ -42,6 +44,7 @@ export default function App() {
       const next = addToHistory(history, result.link)
       saveHistory(next)
       setHistory(next)
+      setArrivingCode(current?.code ?? null)
       setCurrent(result.link)
       setInput('')
       return
@@ -73,20 +76,23 @@ export default function App() {
           inputRef={inputRef}
         />
       </div>
-      <div aria-live="polite" className="mt-2">
-        {current && (
-          <>
-            <p className="sr-only">Short link ready: {current.shortUrl}</p>
-            <ShortLinkResult key={current.code} link={current} />
-          </>
-        )}
-      </div>
-      {earlier.length > 0 && (
-        <div className="mt-10">
-          <RecentLinks links={earlier} />
-        </div>
-      )}
-      <Toaster position="bottom-center" />
+      <MotionConfig reducedMotion="user" transition={linkTransition}>
+        <LayoutGroup>
+          <div aria-live="polite" className="mt-2">
+            {current && (
+              <>
+                <p className="sr-only">Short link ready: {current.shortUrl}</p>
+                <ShortLinkResult key={current.code} link={current} />
+              </>
+            )}
+          </div>
+          {earlier.length > 0 && (
+            <div className="mt-10">
+              <RecentLinks links={earlier} arrivingCode={arrivingCode} />
+            </div>
+          )}
+        </LayoutGroup>
+      </MotionConfig>
     </main>
   )
 }
