@@ -6,13 +6,14 @@ export type LinkState = {
   current: ShortLink | null
   history: ShortLink[]
   arrivingCode: string | null
+  cameFromRecent: boolean
 }
 
 let state: LinkState | null = null
 const listeners = new Set<() => void>()
 
 function getState(): LinkState {
-  state ??= { current: null, history: loadHistory(), arrivingCode: null }
+  state ??= { current: null, history: loadHistory(), arrivingCode: null, cameFromRecent: false }
   return state
 }
 
@@ -33,9 +34,15 @@ export function useLinkState(): LinkState {
   return useSyncExternalStore(subscribe, getState, getState)
 }
 
-export function showNewLink(link: ShortLink) {
+export function showLink(link: ShortLink) {
   const { current, history } = getState()
-  setState({ current: link, history: addToHistory(history, link), arrivingCode: current?.code ?? null })
+  if (current?.code === link.code) return
+  setState({
+    current: link,
+    history: addToHistory(history, link),
+    arrivingCode: current?.code ?? null,
+    cameFromRecent: history.some((item) => item.code === link.code),
+  })
 }
 
 export function addEarlierLink(link: ShortLink) {
@@ -45,9 +52,9 @@ export function addEarlierLink(link: ShortLink) {
 }
 
 export function clearCurrent() {
-  setState({ ...getState(), current: null, arrivingCode: null })
+  setState({ ...getState(), current: null, arrivingCode: null, cameFromRecent: false })
 }
 
 export function clearHistory() {
-  setState({ current: null, history: [], arrivingCode: null })
+  setState({ current: null, history: [], arrivingCode: null, cameFromRecent: false })
 }

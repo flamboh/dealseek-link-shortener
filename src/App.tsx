@@ -6,7 +6,8 @@ import { ShortLinkResult } from './components/ShortLinkResult'
 import { Wordmark } from './components/Wordmark'
 import { linkTransition } from './components/motion'
 import { shortenLink } from './lib/api'
-import { showNewLink, useLinkState } from './lib/link-store'
+import { findByUrl } from './lib/history'
+import { showLink, useLinkState } from './lib/link-store'
 import { cn } from './lib/utils'
 import { checkUrl, sameUrl } from './lib/validate-url'
 
@@ -14,11 +15,24 @@ export default function App() {
   const [input, setInput] = useState('')
   const [pending, setPending] = useState(false)
   const [problem, setProblem] = useState<Problem>(null)
-  const { current, history, arrivingCode } = useLinkState()
+  const [alreadyShortened, setAlreadyShortened] = useState(false)
+  const { current, history, arrivingCode, cameFromRecent } = useLinkState()
   const inFlight = useRef(false)
+  const noticeTimer = useRef<number | undefined>(undefined)
   const inputRef = useRef<HTMLInputElement>(null)
 
   const earlier = history.filter((link) => link.code !== current?.code)
+
+  const showAlreadyShortened = () => {
+    window.clearTimeout(noticeTimer.current)
+    setAlreadyShortened(true)
+    noticeTimer.current = window.setTimeout(() => setAlreadyShortened(false), 4000)
+  }
+
+  const hideAlreadyShortened = () => {
+    window.clearTimeout(noticeTimer.current)
+    setAlreadyShortened(false)
+  }
 
   const submit = async () => {
     if (inFlight.current) return
@@ -30,9 +44,12 @@ export default function App() {
       return
     }
 
-    if (current && sameUrl(current.url, check.url)) {
+    const existing = findByUrl(history, check.url)
+    if (existing) {
+      showLink(existing)
       setProblem(null)
       setInput('')
+      showAlreadyShortened()
       return
     }
 
@@ -46,8 +63,9 @@ export default function App() {
     setPending(false)
 
     if (result.ok) {
-      showNewLink(result.link)
+      showLink(result.link)
       setInput('')
+      hideAlreadyShortened()
       return
     }
 
@@ -61,9 +79,15 @@ export default function App() {
     }
   }
 
+  const isCurrentLink = (value: string) => {
+    const check = checkUrl(value)
+    return check.ok && current !== null && sameUrl(check.url, current.url)
+  }
+
   const handleValueChange = (value: string) => {
     setInput(value)
     if (problem) setProblem(null)
+    if (alreadyShortened && !isCurrentLink(value)) hideAlreadyShortened()
   }
 
   return (
@@ -78,6 +102,7 @@ export default function App() {
           onSubmit={() => void submit()}
           pending={pending}
           problem={problem}
+          alreadyShortened={alreadyShortened}
           inputRef={inputRef}
         />
       </div>
@@ -87,7 +112,7 @@ export default function App() {
             {current && (
               <>
                 <p className="sr-only">Short link ready: {current.shortUrl}</p>
-                <ShortLinkResult key={current.code} link={current} />
+                <ShortLinkResult key={current.code} link={current} cameFromRecent={cameFromRecent} />
               </>
             )}
           </div>

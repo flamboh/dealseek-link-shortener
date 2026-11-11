@@ -12,6 +12,7 @@ export function RecentLinks({ links, arrivingCode }: RecentLinksProps) {
     <section aria-labelledby="recent-label">
       <motion.h2
         id="recent-label"
+        layout="position"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         className="px-3 text-xs font-medium text-muted-foreground"
@@ -20,6 +21,7 @@ export function RecentLinks({ links, arrivingCode }: RecentLinksProps) {
       </motion.h2>
       <motion.div
         aria-hidden="true"
+        layout="position"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         className="mt-2 border-t border-border"

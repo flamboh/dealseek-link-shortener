@@ -1,9 +1,12 @@
 import type { FormEvent, RefObject } from 'react'
+import { AnimatePresence, motion, useReducedMotion } from 'motion/react'
 import { HugeiconsIcon } from '@hugeicons/react'
 import { ArrowRight02Icon, Link02Icon } from '@hugeicons/core-free-icons'
 import { loaderCircleIcon } from './icons/loader-circle'
 import { Button } from './ui/button'
 import { Input } from './ui/input'
+import { cn } from '../lib/utils'
+import { linkTransition } from './motion'
 
 export type Problem =
   | { kind: 'invalid'; message: string }
@@ -17,10 +20,23 @@ type LinkFormProps = {
   onSubmit: () => void
   pending: boolean
   problem: Problem
+  alreadyShortened: boolean
   inputRef: RefObject<HTMLInputElement | null>
 }
 
-export function LinkForm({ value, onValueChange, onSubmit, pending, problem, inputRef }: LinkFormProps) {
+export function LinkForm({
+  value,
+  onValueChange,
+  onSubmit,
+  pending,
+  problem,
+  alreadyShortened,
+  inputRef,
+}: LinkFormProps) {
+  const reduceMotion = useReducedMotion()
+  const closed = reduceMotion ? { opacity: 0 } : { height: 0, opacity: 0 }
+  const open = reduceMotion ? { opacity: 1 } : { height: 'auto', opacity: 1 }
+
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
     onSubmit()
@@ -50,8 +66,26 @@ export function LinkForm({ value, onValueChange, onSubmit, pending, problem, inp
             aria-describedby="url-problem"
             onChange={(event) => onValueChange(event.target.value)}
             placeholder="Paste a link"
-            className="h-10 rounded-lg pl-9 placeholder:text-muted-foreground/60"
+            className={cn('h-10 rounded-lg pl-9 placeholder:text-muted-foreground/60', alreadyShortened && 'rounded-b-none')}
           />
+        </div>
+        <div role="status">
+          <AnimatePresence initial={false}>
+            {alreadyShortened && (
+              <motion.div
+                key="already-shortened"
+                initial={closed}
+                animate={open}
+                exit={closed}
+                transition={linkTransition}
+                className="overflow-hidden"
+              >
+                <p className="rounded-b-lg border border-t-0 border-input bg-muted px-3 py-2 text-xs leading-4 text-muted-foreground">
+                  You already shortened this link.
+                </p>
+              </motion.div>
+            )}
+          </AnimatePresence>
         </div>
         <p id="url-problem" aria-live="polite" className="min-h-5 pt-1 text-xs leading-4 text-destructive">
           {(problem?.kind === 'invalid' || problem?.kind === 'rate-limited') && problem.message}
