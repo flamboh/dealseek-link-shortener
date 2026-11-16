@@ -31,8 +31,8 @@
 }
 
 :root {
-  --ds-orange: #e5541a;
-  --ds-orange-bright: #ff6523;
+  --green: #15803d;
+  --green-bright: #4ade80;
   --radius: 0.125rem;
   --background: #ffffff;
   --foreground: #171717;
@@ -40,17 +40,17 @@
   --card-foreground: #171717;
   --popover: #ffffff;
   --popover-foreground: #171717;
-  --primary: var(--ds-orange-bright);
-  --primary-foreground: #171717;
-  --primary-hover: color-mix(in srgb, #ff6523 80%, #71330a);
-  --brand: var(--ds-orange);
+  --primary: var(--green);
+  --primary-foreground: #ffffff;
+  --primary-hover: color-mix(in srgb, var(--green) 85%, #000000);
+  --brand: var(--green);
   --muted: #f7f7f7;
   --muted-foreground: #5c5c5c;
-  --accent: color-mix(in srgb, #ff6523 10%, transparent);
+  --accent: color-mix(in srgb, var(--green) 10%, transparent);
   --accent-foreground: #171717;
   --border: #ebebeb;
   --input: #d1d1d1;
-  --ring: #ff6523;
+  --ring: var(--green);
   --destructive: #e93544;
   color-scheme: light;
 }
@@ -63,7 +63,12 @@
     --card-foreground: #ffffff;
     --popover: #292929;
     --popover-foreground: #ffffff;
-    --brand: var(--ds-orange-bright);
+    --primary: var(--green-bright);
+    --primary-foreground: #0a0a0a;
+    --primary-hover: color-mix(in srgb, var(--green-bright) 85%, #000000);
+    --brand: var(--green-bright);
+    --accent: color-mix(in srgb, var(--green-bright) 10%, transparent);
+    --ring: var(--green-bright);
     --muted: #292929;
     --muted-foreground: #a3a3a3;
     --accent-foreground: #ffffff;

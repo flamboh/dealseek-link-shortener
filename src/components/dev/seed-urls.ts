@@ -24,12 +24,12 @@ const digits = (length: number) => Array.from({ length }, () => Math.floor(Math.
 const asin = () => `B0${Array.from({ length: 8 }, () => pick([...alphanumeric])).join('')}`
 
 const stores: Array<(slug: string) => string> = [
-  () => `https://www.amazon.com/dp/${asin()}?tag=dealseek-20`,
-  (slug) => `https://www.amazon.com/${slug}/dp/${asin()}?tag=dealseek-20&th=1`,
+  () => `https://www.amazon.com/dp/${asin()}`,
+  (slug) => `https://www.amazon.com/${slug}/dp/${asin()}?th=1`,
   (slug) => `https://www.bestbuy.com/site/${slug}/${digits(7)}.p?skuId=${digits(7)}`,
   (slug) => `https://www.target.com/p/${slug}/-/A-${digits(8)}`,
   (slug) => `https://www.walmart.com/ip/${slug}/${digits(9)}`,
-  (slug) => `https://dealseek.com/deals/${slug}-${digits(5)}`,
+  (slug) => `https://www.ebay.com/itm/${slug}/${digits(12)}`,
 ]
 
 export function seedUrls(count: number): string[] {
