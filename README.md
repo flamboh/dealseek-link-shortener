@@ -1,9 +1,9 @@
 <div>
   <p align="center">
-    <img src="public/favicon.svg" alt="" width="128" height="128" />
+    <img src="public/apple-touch-icon.png" alt="" width="128" height="128" />
   </p>
 
-  <h1 align="center">oli.boo links</h1>
+  <h1 align="center">links</h1>
 
   <p align="center">
     A copy-first link shortener. <br>

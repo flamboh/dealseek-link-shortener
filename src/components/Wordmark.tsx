@@ -1,11 +1,7 @@
 export function Wordmark() {
   return (
-    <h1
-      aria-label="oli.boo links"
-      className="text-center text-5xl leading-none font-[750] tracking-[-0.04em] select-none sm:text-6xl"
-    >
-      oli.boo
-      <span className="ml-[0.2em] align-baseline text-[0.4em] tracking-[-0.02em] text-brand">links</span>
+    <h1 className="text-center text-5xl leading-none font-[750] tracking-[-0.04em] text-brand select-none sm:text-6xl">
+      links
     </h1>
   )
 }

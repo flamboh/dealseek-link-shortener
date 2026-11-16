@@ -3,7 +3,7 @@ export const NOT_FOUND_HTML = `<!doctype html>
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Link not found · oli.boo links</title>
+<title>Link not found · links</title>
 <style>
 body{font-family:system-ui,sans-serif;display:grid;place-items:center;min-height:100vh;margin:0;background:#fafafa;color:#18181b}
 main{text-align:center;padding:16px}
@@ -26,7 +26,7 @@ export const REVOKED_HTML = `<!doctype html>
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Link removed · oli.boo links</title>
+<title>Link removed · links</title>
 <style>
 body{font-family:system-ui,sans-serif;display:grid;place-items:center;min-height:100vh;margin:0;background:#fafafa;color:#18181b}
 main{text-align:center;padding:16px}
@@ -49,7 +49,7 @@ export const TOO_MANY_LOOKUPS_HTML = `<!doctype html>
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Slow down · oli.boo links</title>
+<title>Slow down · links</title>
 <style>
 body{font-family:system-ui,sans-serif;display:grid;place-items:center;min-height:100vh;margin:0;background:#fafafa;color:#18181b}
 main{text-align:center;padding:16px}
