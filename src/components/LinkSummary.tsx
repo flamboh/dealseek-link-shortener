@@ -5,7 +5,7 @@ import { ArrowUpRight01Icon } from '@hugeicons/core-free-icons'
 import type { ShortLink } from '../lib/api'
 import { copyText } from '../lib/clipboard'
 import { displayUrl, formatStats } from '../lib/format'
-import { useLinkStats } from '../lib/link-store'
+import { useLinkStats, useStatsChecked } from '../lib/link-store'
 import { showToast } from '../lib/toast'
 import { cn } from '../lib/utils'
 import { RevokeControls } from './RevokeControls'
@@ -18,6 +18,7 @@ type LinkSummaryProps = {
 export function LinkSummary({ link, prominent = false }: LinkSummaryProps) {
   const shortRef = useRef<HTMLSpanElement>(null)
   const stats = useLinkStats(link.code)
+  const statsChecked = useStatsChecked()
   const [hadStatsAtMount] = useState(stats !== undefined)
 
   const copy = async () => {
@@ -81,6 +82,8 @@ export function LinkSummary({ link, prominent = false }: LinkSummaryProps) {
               >
                 {formatStats(stats)}
               </motion.span>
+            ) : statsChecked ? (
+              '\u00a0'
             ) : (
               <span
                 aria-hidden="true"

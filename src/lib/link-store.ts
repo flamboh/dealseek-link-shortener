@@ -8,6 +8,7 @@ export type LinkState = {
   arrivingCode: string | null
   cameFromRecent: boolean
   stats: Record<string, LinkStats>
+  statsChecked: boolean
   removingCodes: string[]
 }
 
@@ -16,7 +17,7 @@ let loadingStats = false
 const listeners = new Set<() => void>()
 
 function getState(): LinkState {
-  state ??= { current: null, history: loadHistory(), arrivingCode: null, cameFromRecent: false, stats: {}, removingCodes: [] }
+  state ??= { current: null, history: loadHistory(), arrivingCode: null, cameFromRecent: false, stats: {}, statsChecked: false, removingCodes: [] }
   return state
 }
 
@@ -36,7 +37,7 @@ export async function refreshStats() {
   loadingStats = true
   const next = await fetchStats(getState().history)
   loadingStats = false
-  if (next) setState({ ...getState(), stats: { ...getState().stats, ...next } })
+  setState({ ...getState(), stats: next ? { ...getState().stats, ...next } : getState().stats, statsChecked: true })
 }
 
 function refreshWhenVisible() {
@@ -68,6 +69,11 @@ export function useLinkStats(code: string): LinkStats | undefined {
   return useSyncExternalStore(subscribe, getStats, getStats)
 }
 
+export function useStatsChecked(): boolean {
+  const getChecked = () => getState().statsChecked
+  return useSyncExternalStore(subscribe, getChecked, getChecked)
+}
+
 export function showLink(link: ShortLink) {
   const { current, history, stats } = getState()
   if (current?.code === link.code) return
@@ -96,7 +102,7 @@ export function clearCurrent() {
 }
 
 export function clearHistory() {
-  setState({ current: null, history: [], arrivingCode: null, cameFromRecent: false, stats: {}, removingCodes: [] })
+  setState({ ...getState(), current: null, history: [], arrivingCode: null, cameFromRecent: false, stats: {}, removingCodes: [] })
 }
 
 export function startRemoving(code: string) {
@@ -111,6 +117,7 @@ export function finishRemoving(code: string) {
   const { [code]: _removed, ...remainingStats } = stats
   const wasCurrent = current?.code === code
   setState({
+    ...getState(),
     current: wasCurrent ? null : current,
     history: removeFromHistory(history, code),
     arrivingCode: wasCurrent || arrivingCode === code ? null : arrivingCode,
