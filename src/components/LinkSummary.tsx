@@ -1,11 +1,11 @@
-import { useRef } from 'react'
+import { useRef, useState } from 'react'
 import { motion } from 'motion/react'
 import { HugeiconsIcon } from '@hugeicons/react'
 import { ArrowUpRight01Icon } from '@hugeicons/core-free-icons'
 import type { ShortLink } from '../lib/api'
 import { copyText } from '../lib/clipboard'
 import { displayUrl, formatStats } from '../lib/format'
-import { useLinkStats } from '../lib/link-store'
+import { useLinkStats, useStatsChecked } from '../lib/link-store'
 import { showToast } from '../lib/toast'
 import { cn } from '../lib/utils'
 import { RevokeControls } from './RevokeControls'
@@ -18,6 +18,8 @@ type LinkSummaryProps = {
 export function LinkSummary({ link, prominent = false }: LinkSummaryProps) {
   const shortRef = useRef<HTMLSpanElement>(null)
   const stats = useLinkStats(link.code)
+  const statsChecked = useStatsChecked()
+  const [hadStatsAtMount] = useState(stats !== undefined)
 
   const copy = async () => {
     if (await copyText(link.shortUrl)) {
@@ -72,7 +74,22 @@ export function LinkSummary({ link, prominent = false }: LinkSummaryProps) {
             layout="position"
             className="mt-0.5 text-xs leading-4 text-muted-foreground/80 tabular-nums"
           >
-            {stats ? formatStats(stats) : '\u00a0'}
+            {stats ? (
+              <motion.span
+                initial={hadStatsAtMount ? false : { opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ duration: 0.2, ease: 'easeOut' }}
+              >
+                {formatStats(stats)}
+              </motion.span>
+            ) : statsChecked ? (
+              '\u00a0'
+            ) : (
+              <span
+                aria-hidden="true"
+                className="inline-block h-2.5 w-24 rounded-full bg-foreground/10 align-middle motion-safe:animate-pulse"
+              />
+            )}
           </motion.p>
         )}
       </div>
