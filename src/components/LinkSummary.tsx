@@ -1,4 +1,4 @@
-import { useRef } from 'react'
+import { useRef, useState } from 'react'
 import { motion } from 'motion/react'
 import { HugeiconsIcon } from '@hugeicons/react'
 import { ArrowUpRight01Icon } from '@hugeicons/core-free-icons'
@@ -18,6 +18,7 @@ type LinkSummaryProps = {
 export function LinkSummary({ link, prominent = false }: LinkSummaryProps) {
   const shortRef = useRef<HTMLSpanElement>(null)
   const stats = useLinkStats(link.code)
+  const [hadStatsAtMount] = useState(stats !== undefined)
 
   const copy = async () => {
     if (await copyText(link.shortUrl)) {
@@ -47,7 +48,7 @@ export function LinkSummary({ link, prominent = false }: LinkSummaryProps) {
         aria-label={`Copy ${link.shortUrl}`}
         onClick={() => void copy()}
         className={cn(
-          'absolute inset-0 cursor-pointer outline-none transition-colors duration-150 hover:bg-foreground/[0.035] focus-visible:ring-[3px] focus-visible:ring-ring/50 active:bg-foreground/[0.06] dark:hover:bg-foreground/[0.05] dark:active:bg-foreground/[0.08]',
+          'absolute inset-0 cursor-pointer outline-none transition-colors duration-150 hover:bg-foreground/[0.035] focus-visible:ring-[3px] focus-visible:ring-ring/50 active:bg-foreground/[0.06] dark:hover:bg-foreground/[0.05] dark:active:bg-foreground/10',
           prominent ? 'rounded-lg' : 'rounded-md',
         )}
       />
@@ -72,7 +73,20 @@ export function LinkSummary({ link, prominent = false }: LinkSummaryProps) {
             layout="position"
             className="mt-0.5 text-xs leading-4 text-muted-foreground/80 tabular-nums"
           >
-            {stats ? formatStats(stats) : '\u00a0'}
+            {stats ? (
+              <motion.span
+                initial={hadStatsAtMount ? false : { opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ duration: 0.2, ease: 'easeOut' }}
+              >
+                {formatStats(stats)}
+              </motion.span>
+            ) : (
+              <span
+                aria-hidden="true"
+                className="inline-block h-2.5 w-24 rounded-full bg-foreground/10 align-middle motion-safe:animate-pulse"
+              />
+            )}
           </motion.p>
         )}
       </div>
