@@ -1,12 +1,12 @@
 <div>
   <p align="center">
-    <img src="public/favicon.svg" alt="" width="128" height="128" />
+    <img src="public/apple-touch-icon.png" alt="" width="128" height="128" />
   </p>
 
-  <h1 align="center">DealSeek links</h1>
+  <h1 align="center">links</h1>
 
   <p align="center">
-    A copy-first link shortener for DealSeek deals. <br>
+    A copy-first link shortener. <br>
     Paste a long link, get a short one to share anywhere.
     <br />
     <a href="https://link.oli.boo">link.oli.boo</a>

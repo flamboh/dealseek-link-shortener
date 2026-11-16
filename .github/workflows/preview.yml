@@ -39,7 +39,7 @@ jobs:
           PREVIEW_URL: ${{ steps.preview.outputs.url }}
         with:
           script: |
-            const marker = '<!-- dealseek-preview -->'
+            const marker = '<!-- link-preview -->'
             const body = `${marker}\n**Preview deployed:** ${process.env.PREVIEW_URL}\n\nCommit: ${context.payload.pull_request.head.sha}`
             const { owner, repo } = context.repo
             const issue_number = context.issue.number

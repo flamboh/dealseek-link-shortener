@@ -3,12 +3,12 @@ export const NOT_FOUND_HTML = `<!doctype html>
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Link not found · Dealseek links</title>
+<title>Link not found · links</title>
 <style>
 body{font-family:system-ui,sans-serif;display:grid;place-items:center;min-height:100vh;margin:0;background:#fafafa;color:#18181b}
 main{text-align:center;padding:16px}
-a{color:#2563eb}
-@media (prefers-color-scheme:dark){body{background:#18181b;color:#fafafa}a{color:#60a5fa}}
+a{color:#15803d}
+@media (prefers-color-scheme:dark){body{background:#18181b;color:#fafafa}a{color:#4ade80}}
 </style>
 </head>
 <body>
@@ -26,12 +26,12 @@ export const REVOKED_HTML = `<!doctype html>
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Link removed · Dealseek links</title>
+<title>Link removed · links</title>
 <style>
 body{font-family:system-ui,sans-serif;display:grid;place-items:center;min-height:100vh;margin:0;background:#fafafa;color:#18181b}
 main{text-align:center;padding:16px}
-a{color:#2563eb}
-@media (prefers-color-scheme:dark){body{background:#18181b;color:#fafafa}a{color:#60a5fa}}
+a{color:#15803d}
+@media (prefers-color-scheme:dark){body{background:#18181b;color:#fafafa}a{color:#4ade80}}
 </style>
 </head>
 <body>
@@ -49,12 +49,12 @@ export const TOO_MANY_LOOKUPS_HTML = `<!doctype html>
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Slow down · Dealseek links</title>
+<title>Slow down · links</title>
 <style>
 body{font-family:system-ui,sans-serif;display:grid;place-items:center;min-height:100vh;margin:0;background:#fafafa;color:#18181b}
 main{text-align:center;padding:16px}
-a{color:#2563eb}
-@media (prefers-color-scheme:dark){body{background:#18181b;color:#fafafa}a{color:#60a5fa}}
+a{color:#15803d}
+@media (prefers-color-scheme:dark){body{background:#18181b;color:#fafafa}a{color:#4ade80}}
 </style>
 </head>
 <body>
