@@ -7,7 +7,7 @@
 
   <p align="center">
     A copy-first link shortener. <br>
-    Paste a long link, get a short one to share anywhere.
+    Paste a long link, get a short one and a QR code to share anywhere.
     <br />
     <a href="https://link.oli.boo">link.oli.boo</a>
   </p>
@@ -20,6 +20,7 @@ One Cloudflare Worker serves the React app and the API.
 - `POST /api/links` with `{ "url": "https://..." }` creates a short link.
 - `GET /<code>` redirects (302) to the saved URL, or shows a 404 page.
 - Codes are 8 characters from a 45-character alphabet with no vowels and no look-alikes (`0 O 1 l I 3 4`). A small blocklist in `worker/blocklist.ts` rerolls any code that still spells something bad.
+- Every link has a QR button. It draws the QR code in the browser (`src/lib/qr.ts`, using `uqr`) and copies it as a PNG. Browsers that can't put images on the clipboard download the PNG instead.
 - Links live in D1 (SQLite). Workers KV caches code → URL for a day, so most redirects never touch the database.
 
 ## Click stats

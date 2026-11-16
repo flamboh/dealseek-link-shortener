@@ -19,9 +19,10 @@ export function Toaster() {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: 4 }}
             transition={{ duration: 0.2, ease: linkTransition.ease }}
-            className="max-w-full truncate rounded-lg border border-border bg-popover px-3 py-2 text-xs font-medium text-popover-foreground shadow-lg"
+            className="flex max-w-full items-center gap-3 rounded-lg border border-border bg-popover px-3 py-2 text-xs font-medium text-popover-foreground shadow-lg"
           >
-            {toast.message}
+            {toast.image && <img src={toast.image} alt="" className="size-16 shrink-0 rounded-sm" />}
+            <span className="min-w-0 truncate">{toast.message}</span>
           </motion.div>
         )}
       </AnimatePresence>

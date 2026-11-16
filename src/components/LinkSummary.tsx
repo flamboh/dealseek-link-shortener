@@ -1,14 +1,18 @@
 import { useRef, useState } from 'react'
 import { motion } from 'motion/react'
 import { HugeiconsIcon } from '@hugeicons/react'
-import { ArrowUpRight01Icon } from '@hugeicons/core-free-icons'
+import { ArrowUpRight01Icon, QrCodeIcon } from '@hugeicons/core-free-icons'
 import type { ShortLink } from '../lib/api'
 import { copyText } from '../lib/clipboard'
 import { displayUrl, formatStats } from '../lib/format'
 import { useLinkStats, useStatsChecked } from '../lib/link-store'
+import { copyQr } from '../lib/qr'
 import { showToast } from '../lib/toast'
 import { cn } from '../lib/utils'
 import { RevokeControls } from './RevokeControls'
+
+const iconAction =
+  'inline-flex size-8 cursor-pointer items-center justify-center rounded-md text-muted-foreground outline-none transition-colors duration-100 hover:bg-accent hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring active:bg-border dark:hover:bg-accent/50 dark:active:bg-accent'
 
 type LinkSummaryProps = {
   link: ShortLink
@@ -30,16 +34,43 @@ export function LinkSummary({ link, prominent = false }: LinkSummaryProps) {
     showToast('Couldn’t copy. Select the link and copy it manually.')
   }
 
+  const copyQrImage = async () => {
+    const name = displayUrl(link.shortUrl)
+    const result = await copyQr(link.shortUrl, `qr-${link.code}.png`)
+    if (result.outcome === 'copied') showToast(`Copied QR code for ${name}`, result.preview)
+    else if (result.outcome === 'downloaded') showToast(`Downloaded QR code for ${name}`, result.preview)
+    else showToast('Couldn’t make a QR code. Try again.')
+  }
+
+  const qrButton = (
+    <button
+      type="button"
+      aria-label={`Copy QR code for ${link.shortUrl}`}
+      title="Copy QR code"
+      onClick={() => void copyQrImage()}
+      className={iconAction}
+    >
+      <HugeiconsIcon icon={QrCodeIcon} strokeWidth={2} className="size-4" />
+    </button>
+  )
+
   const openLink = !prominent && (
     <a
       href={link.shortUrl}
       target="_blank"
       rel="noopener noreferrer"
       aria-label={`Open ${link.shortUrl} in a new tab`}
-      className="inline-flex size-8 items-center justify-center rounded-md text-muted-foreground outline-none transition-colors duration-100 hover:bg-accent hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring active:bg-border dark:hover:bg-accent/50 dark:active:bg-accent"
+      className={iconAction}
     >
       <HugeiconsIcon icon={ArrowUpRight01Icon} strokeWidth={2} className="size-4" />
     </a>
+  )
+
+  const actions = (
+    <>
+      {qrButton}
+      {openLink}
+    </>
   )
 
   return (
@@ -93,11 +124,9 @@ export function LinkSummary({ link, prominent = false }: LinkSummaryProps) {
           </motion.p>
         )}
       </div>
-      {(link.ownerToken || !prominent) && (
-        <motion.div layoutId={`${link.code}:actions`} layout="position" className="relative flex items-center gap-0.5">
-          {link.ownerToken ? <RevokeControls link={link}>{openLink}</RevokeControls> : openLink}
-        </motion.div>
-      )}
+      <motion.div layoutId={`${link.code}:actions`} layout="position" className="relative flex items-center gap-0.5">
+        {link.ownerToken ? <RevokeControls link={link}>{actions}</RevokeControls> : actions}
+      </motion.div>
     </>
   )
 }
