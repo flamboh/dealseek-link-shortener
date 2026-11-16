@@ -1,8 +1,9 @@
 import { useSyncExternalStore } from 'react'
 
-export type Toast = { id: number; message: string }
+export type Toast = { id: number; message: string; image?: string }
 
 const DURATION_MS = 2000
+const IMAGE_DURATION_MS = 3000
 
 let toast: Toast | null = null
 let nextId = 1
@@ -27,8 +28,8 @@ export function useToast(): Toast | null {
   return useSyncExternalStore(subscribe, getToast, getToast)
 }
 
-export function showToast(message: string) {
+export function showToast(message: string, image?: string) {
   window.clearTimeout(timer)
-  emit({ id: nextId++, message })
-  timer = window.setTimeout(() => emit(null), DURATION_MS)
+  emit({ id: nextId++, message, image })
+  timer = window.setTimeout(() => emit(null), image ? IMAGE_DURATION_MS : DURATION_MS)
 }
