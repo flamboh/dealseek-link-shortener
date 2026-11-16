@@ -1,12 +1,11 @@
 import { encode } from 'uqr'
 
 const MODULE_PX = 16
-const QUIET_ZONE = 4
 
 export type QrResult = { outcome: 'copied' | 'downloaded'; preview: string } | { outcome: 'failed' }
 
 export function drawQr(text: string): HTMLCanvasElement {
-  const { data, size } = encode(text, { ecc: 'M', border: QUIET_ZONE })
+  const { data, size } = encode(text, { ecc: 'L', border: 1 })
   const canvas = document.createElement('canvas')
   canvas.width = size * MODULE_PX
   canvas.height = size * MODULE_PX
