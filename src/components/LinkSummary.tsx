@@ -48,7 +48,7 @@ export function LinkSummary({ link, prominent = false }: LinkSummaryProps) {
         aria-label={`Copy ${link.shortUrl}`}
         onClick={() => void copy()}
         className={cn(
-          'absolute inset-0 cursor-pointer outline-none transition-colors duration-150 hover:bg-foreground/[0.035] focus-visible:ring-[3px] focus-visible:ring-ring/50 active:bg-foreground/[0.06] dark:hover:bg-foreground/[0.05] dark:active:bg-foreground/10',
+          'absolute inset-0 cursor-pointer outline-none transition-colors duration-150 hover:bg-foreground/[0.035] focus-visible:ring-[3px] focus-visible:ring-ring/50 active:bg-foreground/[0.06] dark:hover:bg-foreground/[0.05] dark:active:bg-foreground/[0.08]',
           prominent ? 'rounded-lg' : 'rounded-md',
         )}
       />
